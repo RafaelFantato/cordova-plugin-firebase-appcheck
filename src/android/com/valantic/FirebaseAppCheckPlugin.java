@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.appcheck.FirebaseAppCheck;
 import com.google.firebase.appcheck.AppCheckToken;
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory;
@@ -16,20 +17,22 @@ public class FirebaseAppCheckPlugin extends CordovaPlugin {
 
     private static final String TAG = "AppCheck";
 
+
+
     @Override
     protected void pluginInitialize() {
         try {
             Log.d(TAG, "pluginInitialize() iniciado.");
+            
+            Context context = this.cordova.getActivity().getApplicationContext();
 
-            Context context = cordova.getActivity() != null
-                    ? cordova.getActivity().getApplicationContext()
-                    : cordova.getContext();
+            FirebaseOptions options = FirebaseOptions.fromResource(context);
 
-            if (FirebaseApp.getApps(context).isEmpty()) {
-                FirebaseApp.initializeApp(context);
-                Log.d(TAG, "FirebaseApp inicializado no pluginInitialize.");
+            if (options != null) {
+                FirebaseApp.initializeApp(context, options);
+                Log.d(TAG, "FirebaseApp inicializado com config explícita.");
             } else {
-                Log.d(TAG, "FirebaseApp já estava inicializado.");
+                Log.e(TAG, "FirebaseOptions.fromResource retornou null — verifique se o google-services.json está incluído.");
             }
         } catch (Exception e) {
             Log.e(TAG, "Erro no pluginInitialize: " + e.getMessage(), e);
