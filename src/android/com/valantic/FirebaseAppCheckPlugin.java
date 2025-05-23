@@ -18,28 +18,24 @@ public class FirebaseAppCheckPlugin extends CordovaPlugin {
 
     @Override
     protected void pluginInitialize() {
-        super.pluginInitialize();
         try {
-            Log.d(TAG, "Inicializando FirebaseApp...");
+            Log.d(TAG, "pluginInitialize() iniciado.");
 
-            Context context = cordova.getActivity() != null ? cordova.getActivity().getApplicationContext() : cordova.getContext();
+            Context context = cordova.getActivity() != null
+                    ? cordova.getActivity().getApplicationContext()
+                    : cordova.getContext();
 
             if (FirebaseApp.getApps(context).isEmpty()) {
                 FirebaseApp.initializeApp(context);
-                Log.d(TAG, "FirebaseApp inicializado.");
+                Log.d(TAG, "FirebaseApp inicializado no pluginInitialize.");
             } else {
                 Log.d(TAG, "FirebaseApp já estava inicializado.");
             }
-
-            FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
-            PlayIntegrityAppCheckProviderFactory providerFactory = PlayIntegrityAppCheckProviderFactory.getInstance();
-            firebaseAppCheck.installAppCheckProviderFactory(providerFactory);
-
-            Log.d(TAG, "FirebaseAppCheck inicializado com Play Integrity.");
         } catch (Exception e) {
-            Log.e(TAG, "Erro ao inicializar AppCheck: " + e.getMessage(), e);
+            Log.e(TAG, "Erro no pluginInitialize: " + e.getMessage(), e);
         }
     }
+
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -59,8 +55,18 @@ public class FirebaseAppCheckPlugin extends CordovaPlugin {
     }
 
     private void initializeAppCheck(CallbackContext callbackContext) {
-        callbackContext.success("AppCheck Initialized");
+        try {
+            FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
+            PlayIntegrityAppCheckProviderFactory providerFactory = PlayIntegrityAppCheckProviderFactory.getInstance();
+            firebaseAppCheck.installAppCheckProviderFactory(providerFactory);
+            Log.d(TAG, "AppCheckProviderFactory instalado.");
+            callbackContext.success("AppCheck Initialized");
+        } catch (Exception e) {
+            Log.e(TAG, "Erro ao inicializar AppCheck: " + e.getMessage(), e);
+            callbackContext.error("Erro ao inicializar AppCheck: " + e.getMessage());
+        }
     }
+
 
 
     private void pingTest(CallbackContext callbackContext) {
@@ -69,11 +75,12 @@ public class FirebaseAppCheckPlugin extends CordovaPlugin {
 
     private void getToken(final CallbackContext callbackContext) {
         try {
-            Context context = cordova.getActivity() != null ? cordova.getActivity().getApplicationContext() : cordova.getContext();
+            Context context = cordova.getActivity() != null
+                    ? cordova.getActivity().getApplicationContext()
+                    : cordova.getContext();
 
-            // Garante que FirebaseApp está inicializado no momento da chamada
             if (FirebaseApp.getApps(context).isEmpty()) {
-                Log.w("AppCheck", "FirebaseApp não estava inicializado. Inicializando agora...");
+                Log.w(TAG, "FirebaseApp não estava inicializado. Inicializando agora...");
                 FirebaseApp.initializeApp(context);
             }
 
@@ -82,16 +89,18 @@ public class FirebaseAppCheckPlugin extends CordovaPlugin {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
                         AppCheckToken token = task.getResult();
+                        Log.d(TAG, "Token AppCheck obtido com sucesso.");
                         callbackContext.success(token.getToken());
-                        Log.d("AppCheck", "Token recebido com sucesso.");
                     } else {
-                        String errorMsg = task.getException() != null ? task.getException().getMessage() : "Unknown error";
-                        Log.e("AppCheck", "Erro ao obter AppCheck token: " + errorMsg, task.getException());
-                        callbackContext.error("Failed to get AppCheck token: " + errorMsg);
+                        String errorMsg = task.getException() != null
+                                ? task.getException().getMessage()
+                                : "Erro desconhecido";
+                        Log.e(TAG, "Erro ao obter AppCheck token: " + errorMsg, task.getException());
+                        callbackContext.error("Falha ao obter AppCheck token: " + errorMsg);
                     }
                 });
         } catch (Exception e) {
-            Log.e("AppCheck", "Exceção ao solicitar AppCheck token: " + e.getMessage(), e);
+            Log.e(TAG, "Exceção ao solicitar AppCheck token: " + e.getMessage(), e);
             callbackContext.error("Erro inesperado ao obter token: " + e.getMessage());
         }
     }
