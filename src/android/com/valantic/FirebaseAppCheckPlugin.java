@@ -1,7 +1,7 @@
 package com.valantic;
 
 import android.util.Log;
-
+import android.content.Context;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
@@ -22,7 +22,7 @@ public class FirebaseAppCheckPlugin extends CordovaPlugin {
         try {
             Log.d(TAG, "Inicializando FirebaseApp...");
 
-            Context context = cordova.getActivity().getApplicationContext();
+            Context context = cordova.getActivity() != null ? cordova.getActivity().getApplicationContext() : cordova.getContext();
 
             if (FirebaseApp.getApps(context).isEmpty()) {
                 FirebaseApp.initializeApp(context);
@@ -69,7 +69,7 @@ public class FirebaseAppCheckPlugin extends CordovaPlugin {
 
     private void getToken(final CallbackContext callbackContext) {
         try {
-            Context context = cordova.getActivity().getApplicationContext();
+            Context context = cordova.getActivity() != null ? cordova.getActivity().getApplicationContext() : cordova.getContext();
 
             // Garante que FirebaseApp está inicializado no momento da chamada
             if (FirebaseApp.getApps(context).isEmpty()) {
