@@ -22,8 +22,10 @@ public class FirebaseAppCheckPlugin extends CordovaPlugin {
         try {
             Log.d(TAG, "Inicializando FirebaseApp...");
 
-            if (FirebaseApp.getApps(cordova.getContext()).isEmpty()) {
-                FirebaseApp.initializeApp(cordova.getActivity().getApplicationContext());
+            Context context = cordova.getActivity().getApplicationContext();
+
+            if (FirebaseApp.getApps(context).isEmpty()) {
+                FirebaseApp.initializeApp(context);
                 Log.d(TAG, "FirebaseApp inicializado.");
             } else {
                 Log.d(TAG, "FirebaseApp já estava inicializado.");
@@ -67,22 +69,31 @@ public class FirebaseAppCheckPlugin extends CordovaPlugin {
 
     private void getToken(final CallbackContext callbackContext) {
         try {
+            Context context = cordova.getActivity().getApplicationContext();
+
+            // Garante que FirebaseApp está inicializado no momento da chamada
+            if (FirebaseApp.getApps(context).isEmpty()) {
+                Log.w("AppCheck", "FirebaseApp não estava inicializado. Inicializando agora...");
+                FirebaseApp.initializeApp(context);
+            }
+
             FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
             firebaseAppCheck.getAppCheckToken(false)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
                         AppCheckToken token = task.getResult();
                         callbackContext.success(token.getToken());
-                        Log.d(TAG, "Token recebido com sucesso.");
+                        Log.d("AppCheck", "Token recebido com sucesso.");
                     } else {
                         String errorMsg = task.getException() != null ? task.getException().getMessage() : "Unknown error";
-                        Log.e(TAG, "Erro ao obter AppCheck token: " + errorMsg, task.getException());
+                        Log.e("AppCheck", "Erro ao obter AppCheck token: " + errorMsg, task.getException());
                         callbackContext.error("Failed to get AppCheck token: " + errorMsg);
                     }
                 });
         } catch (Exception e) {
-            Log.e(TAG, "Exceção ao solicitar AppCheck token: " + e.getMessage(), e);
+            Log.e("AppCheck", "Exceção ao solicitar AppCheck token: " + e.getMessage(), e);
             callbackContext.error("Erro inesperado ao obter token: " + e.getMessage());
         }
     }
+
 }
