@@ -1,0 +1,31 @@
+{
+  "name": "cordova-plugin-firebase-appcheck",
+  "version": "1.0.0",
+  "description": "Cordova plugin for Firebase App Check",
+  "cordova": {
+    "id": "cordova-plugin-firebase-appcheck",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "author": "Luiz Costa <luiz.costa@lcs.valantic.com> ",
+  "license": "MIT",
+  "keywords": [
+    "cordova",
+    "firebase",
+    "appcheck",
+    "analytics",
+    "crashlytics",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios"
+  ],
+  "scripts": {
+    "version": "replace -s 'version=\"(.+)(?=\">)' 'version=\"'$npm_package_version plugin.xml && git add plugin.xml",
+    "postversion": "git push && git push --tags"
+  },
+  "dependencies": {
+		"@capacitor-firebase/app-check": "latest"
+	}
+}
