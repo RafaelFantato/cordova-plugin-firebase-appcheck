@@ -23,7 +23,7 @@ public class FirebaseAppCheckPlugin extends CordovaPlugin {
             Log.d(TAG, "Inicializando FirebaseApp...");
 
             if (FirebaseApp.getApps(cordova.getContext()).isEmpty()) {
-                FirebaseApp.initializeApp(cordova.getContext());
+                FirebaseApp.initializeApp(cordova.getActivity().getApplicationContext());
                 Log.d(TAG, "FirebaseApp inicializado.");
             } else {
                 Log.d(TAG, "FirebaseApp já estava inicializado.");
