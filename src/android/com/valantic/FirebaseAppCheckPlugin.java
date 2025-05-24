@@ -26,7 +26,15 @@ public class FirebaseAppCheckPlugin extends CordovaPlugin {
             
             Context context = this.cordova.getActivity().getApplicationContext();
 
-            FirebaseOptions options = FirebaseOptions.fromResource(context);
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                .setApplicationId("1:676134473685:android:21c04fd1d4ece0bf26b75c") // mobilesdk_app_id
+                .setProjectId("unitedrentalsdev")
+                .setApiKey("AIzaSyAdMyR4SErAIu36rAGGD6hAXvIzJTL0Vd0")
+                .setGcmSenderId("676134473685") // project_number
+                .setStorageBucket("unitedrentalsdev.firebasestorage.app") // optional
+                .build();
+
+            //FirebaseOptions options = FirebaseOptions.fromResource(context);
 
             if (options != null) {
                 FirebaseApp.initializeApp(context, options);
